@@ -1,19 +1,43 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, Animated } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { weatherConditions } from "../utils/weatherConditions";
 
-const Weather = ({ weather, temperature }) => {
+const Weather = ({ weather, temperature, cityName }) => {
+  const springValue = new Animated.Value(0.3);
+
+  const spring = () => {
+    Animated.spring(springValue, {
+      toValue: 1,
+      friction: 1,
+    }).start();
+  };
+
+  useEffect(() => {
+    spring();
+  }, []);
+
   return (
-    <View style={styles.weatherContainer}>
-      <View style={styles.headerContainer}>
+    <View
+      style={[
+        styles.weatherContainer,
+        { backgroundColor: weatherConditions[weather].color },
+      ]}
+    >
+      <Animated.View
+        style={[
+          styles.headerContainer,
+          { transform: [{ scale: springValue }] },
+        ]}
+      >
         <MaterialCommunityIcons
           size={72}
           name={weatherConditions[weather].icon}
           color={"#fff"}
         />
         <Text style={styles.tempText}>{temperature}˚</Text>
-      </View>
+        <Text style={styles.tempText}>{cityName}</Text>
+      </Animated.View>
       <View style={styles.bodyContainer}>
         <Text style={styles.title}>{weatherConditions[weather].title}</Text>
         <Text style={styles.subtitle}>
@@ -27,12 +51,14 @@ const Weather = ({ weather, temperature }) => {
 const styles = StyleSheet.create({
   weatherContainer: {
     flex: 1,
+    width: 460,
   },
   headerContainer: {
     flex: 1,
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "space-around",
+    marginTop: 50,
   },
   tempText: {
     fontSize: 72,
